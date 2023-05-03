@@ -11,4 +11,6 @@ public class Card {
     private String number;
     private String validTill;
     private String cvv;
+
+    private int amount;
 }
