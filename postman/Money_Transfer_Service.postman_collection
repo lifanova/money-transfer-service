@@ -1,0 +1,65 @@
+{
+	"info": {
+		"_postman_id": "5247fb9b-d946-4d9e-af26-c5c17fb6ef19",
+		"name": "Money Transfer Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "POST / transfer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"cardFromNumber\":\"1234345122772363\",\r\n    \"cardToNumber\":\"4656748568358575\",\r\n    \"cardFromCVV\":\"124\",\r\n    \"cardFromValidTill\":\"12/23\",\r\n    \"amount\":\r\n        {\r\n            \"currency\":\"RUR\",\r\n            \"value\":50\r\n        }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/transfer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"transfer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST / confirmOperation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"operationId\": \"123345556\",\r\n    \"code\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/confirmOperation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"confirmOperation"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
