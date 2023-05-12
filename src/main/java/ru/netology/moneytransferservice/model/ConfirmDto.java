@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConfirmDTO {
+public class ConfirmDto {
     private String operationId;
     private String code;
 }

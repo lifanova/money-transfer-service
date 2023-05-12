@@ -1,14 +1,13 @@
 package ru.netology.moneytransferservice.controller;
 
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.netology.moneytransferservice.model.ConfirmDTO;
-import ru.netology.moneytransferservice.model.TransferDTO;
+import ru.netology.moneytransferservice.model.ConfirmDto;
+import ru.netology.moneytransferservice.model.TransferDto;
 import ru.netology.moneytransferservice.service.MoneyTransferService;
 
 @RestController
@@ -21,16 +20,16 @@ public class MoneyTransferController {
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<String> transfer(@RequestBody TransferDTO transferData) {
+    public ResponseEntity<String> transfer(@RequestBody TransferDto transferData) {
         String operationId = moneyTransferService.transfer(transferData);
 
-        return new ResponseEntity<>(operationId, HttpStatus.OK);
+        return ResponseEntity.ok().body(operationId);
     }
 
     @PostMapping("/confirmOperation")
-    public ResponseEntity<String> confirmOperation(@RequestBody ConfirmDTO confirmDTO) {
+    public ResponseEntity<String> confirmOperation(@RequestBody ConfirmDto confirmDTO) {
         String operationId = moneyTransferService.confirmOperation(confirmDTO);
 
-        return new ResponseEntity<>(operationId, HttpStatus.OK);
+        return ResponseEntity.ok().body(operationId);
     }
 }

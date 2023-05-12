@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AmountDTO {
+public class AmountDto {
     private int value;
     private String currency;
 }

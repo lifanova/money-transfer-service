@@ -12,21 +12,21 @@ import ru.netology.moneytransferservice.exception.ErrorTransfer;
 public class ExceptionHandlerAdvice {
     private static final String INPUT_MSG = "Ошибка ввода данных карты";
     private static final String TRANSFER_MSG = "Ошибка перевода";
-    private static final String CONFIRM_MSG = "Ошибка подтверждени";
+    private static final String CONFIRM_MSG = "Ошибка подтверждения";
 
     @ExceptionHandler(ErrorInputData.class)
     public ResponseEntity<String> handleErrorInputData(ErrorInputData e) {
-        return new ResponseEntity<>(INPUT_MSG + ": " + e.getMessage(), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(String.format("%s: %s", INPUT_MSG, e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ErrorTransfer.class)
     public ResponseEntity<String> handleErrorTransfer(ErrorTransfer e) {
-        return new ResponseEntity<>(TRANSFER_MSG + ": " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(String.format("%s: %s", TRANSFER_MSG, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(ErrorConfirmation.class)
     public ResponseEntity<String> handleErrorConfirmation(ErrorConfirmation e) {
-        return new ResponseEntity<>(CONFIRM_MSG + ": " + e.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(String.format("%s: %s", CONFIRM_MSG, e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
 }

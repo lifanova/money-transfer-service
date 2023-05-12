@@ -1,10 +1,10 @@
 package ru.netology.moneytransferservice.repository;
 
 import org.springframework.stereotype.Repository;
-import ru.netology.moneytransferservice.model.AmountDTO;
+import ru.netology.moneytransferservice.model.AmountDto;
 import ru.netology.moneytransferservice.model.Card;
-import ru.netology.moneytransferservice.model.ConfirmDTO;
-import ru.netology.moneytransferservice.model.TransferDTO;
+import ru.netology.moneytransferservice.model.ConfirmDto;
+import ru.netology.moneytransferservice.model.TransferDto;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,10 +16,10 @@ public class MoneyTransferRepository {
     public List<Card> cards = Arrays.asList(new Card("1234345122772363", "12/23", "12400", 1000),
             new Card("5559494000057918", "12/23", "123", 0));
 
-    public String transfer(TransferDTO transferDTO) {
+    public String transfer(TransferDto transferDTO) {
         Card cardFrom = findAndCheckCard(transferDTO.getCardFromNumber());
 
-        AmountDTO amount = transferDTO.getAmount();
+        AmountDto amount = transferDTO.getAmount();
         if (amount == null || amount.getValue() <= 0) {
             return null;
         }
@@ -41,7 +41,7 @@ public class MoneyTransferRepository {
         return null;
     }
 
-    public String confirmOperation(ConfirmDTO confirmDTO) {
+    public String confirmOperation(ConfirmDto confirmDTO) {
         return null;
     }
 
