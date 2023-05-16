@@ -1,4 +1,4 @@
-package ru.netology.moneytransferservice.model;
+package ru.netology.moneytransferservice.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Operation {
+public class OperationIdDto {
     private String operationId;
-    private String code;
 }

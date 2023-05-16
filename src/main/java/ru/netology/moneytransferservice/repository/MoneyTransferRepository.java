@@ -1,10 +1,10 @@
 package ru.netology.moneytransferservice.repository;
 
 import org.springframework.stereotype.Repository;
-import ru.netology.moneytransferservice.model.AmountDto;
-import ru.netology.moneytransferservice.model.Card;
-import ru.netology.moneytransferservice.model.ConfirmDto;
-import ru.netology.moneytransferservice.model.TransferDto;
+import ru.netology.moneytransferservice.model.dto.AmountDto;
+import ru.netology.moneytransferservice.model.domain.Card;
+import ru.netology.moneytransferservice.model.dto.ConfirmDto;
+import ru.netology.moneytransferservice.model.dto.TransferDto;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @Repository
 public class MoneyTransferRepository {
+    //TODO: переделать структуру
     public List<Card> cards = Arrays.asList(new Card("1234345122772363", "12/23", "12400", 1000),
             new Card("5559494000057918", "12/23", "123", 0));
 

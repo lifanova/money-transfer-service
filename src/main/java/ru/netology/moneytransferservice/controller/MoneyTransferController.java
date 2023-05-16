@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.netology.moneytransferservice.model.ConfirmDto;
-import ru.netology.moneytransferservice.model.TransferDto;
+import ru.netology.moneytransferservice.model.dto.ConfirmDto;
+import ru.netology.moneytransferservice.model.dto.OperationIdDto;
+import ru.netology.moneytransferservice.model.dto.TransferDto;
 import ru.netology.moneytransferservice.service.MoneyTransferService;
 
 @RestController
@@ -20,16 +21,18 @@ public class MoneyTransferController {
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<String> transfer(@RequestBody TransferDto transferData) {
+    public ResponseEntity<OperationIdDto> transfer(@RequestBody TransferDto transferData) {
         String operationId = moneyTransferService.transfer(transferData);
+        OperationIdDto operationIdDto = new OperationIdDto(operationId);
 
-        return ResponseEntity.ok().body(operationId);
+        return ResponseEntity.ok().body(operationIdDto);
     }
 
     @PostMapping("/confirmOperation")
-    public ResponseEntity<String> confirmOperation(@RequestBody ConfirmDto confirmDTO) {
+    public ResponseEntity<OperationIdDto> confirmOperation(@RequestBody ConfirmDto confirmDTO) {
         String operationId = moneyTransferService.confirmOperation(confirmDTO);
+        OperationIdDto operationIdDto = new OperationIdDto(operationId);
 
-        return ResponseEntity.ok().body(operationId);
+        return ResponseEntity.ok().body(operationIdDto);
     }
 }
