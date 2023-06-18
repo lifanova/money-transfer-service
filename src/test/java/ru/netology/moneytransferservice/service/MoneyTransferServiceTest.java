@@ -82,13 +82,11 @@ public class MoneyTransferServiceTest {
         cardsStorage.put(cardTo.getNumber(), cardTo);
     }
 
-
     @Before
     public void mockTransfer() {
         Mockito.when(moneyTransferRepositoryMock.transfer(transferDto))
                 .thenReturn(expectedDataOperation);
     }
-
 
     @Test
     void testTransferService() {

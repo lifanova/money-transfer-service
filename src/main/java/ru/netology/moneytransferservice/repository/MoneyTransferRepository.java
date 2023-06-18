@@ -7,11 +7,9 @@ import ru.netology.moneytransferservice.exception.ErrorInputData;
 import ru.netology.moneytransferservice.model.domain.Account;
 import ru.netology.moneytransferservice.model.domain.Card;
 import ru.netology.moneytransferservice.model.domain.DataOperation;
-import ru.netology.moneytransferservice.model.dto.ConfirmDto;
 import ru.netology.moneytransferservice.model.dto.TransferDto;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -37,9 +35,7 @@ public class MoneyTransferRepository {
     }
 
     public static DataOperation acceptData(Card currentCard, TransferDto transferDto) {
-        DataOperation dataOperation;
         String cardToNumber = transferDto.getCardToNumber();
-
 
         if (currentCard.getNumber().equals(cardToNumber) ||
                 !(currentCard.getCvv().equals(transferDto.getCardFromCVV()))
@@ -111,10 +107,5 @@ public class MoneyTransferRepository {
 
         return false;
     }
-
-    public Card findCardByNumber(String number) {
-        return getCardMap().get(number);
-    }
-
 
 }

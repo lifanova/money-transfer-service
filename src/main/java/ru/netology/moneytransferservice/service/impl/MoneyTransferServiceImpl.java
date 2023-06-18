@@ -1,13 +1,9 @@
 package ru.netology.moneytransferservice.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.netology.moneytransferservice.exception.ErrorConfirmation;
 import ru.netology.moneytransferservice.exception.ErrorInputData;
-import ru.netology.moneytransferservice.exception.ErrorTransfer;
-import ru.netology.moneytransferservice.model.domain.Card;
 import ru.netology.moneytransferservice.model.domain.DataOperation;
-import ru.netology.moneytransferservice.model.dto.AmountDto;
 import ru.netology.moneytransferservice.model.dto.ConfirmDto;
 import ru.netology.moneytransferservice.model.dto.TransferDto;
 import ru.netology.moneytransferservice.repository.MoneyTransferRepository;
