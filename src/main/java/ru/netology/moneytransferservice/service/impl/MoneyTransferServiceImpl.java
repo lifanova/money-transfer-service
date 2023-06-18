@@ -2,63 +2,128 @@ package ru.netology.moneytransferservice.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.netology.moneytransferservice.exception.ErrorConfirmation;
+import ru.netology.moneytransferservice.exception.ErrorInputData;
 import ru.netology.moneytransferservice.exception.ErrorTransfer;
 import ru.netology.moneytransferservice.model.domain.Card;
+import ru.netology.moneytransferservice.model.domain.DataOperation;
 import ru.netology.moneytransferservice.model.dto.AmountDto;
 import ru.netology.moneytransferservice.model.dto.ConfirmDto;
 import ru.netology.moneytransferservice.model.dto.TransferDto;
 import ru.netology.moneytransferservice.repository.MoneyTransferRepository;
 import ru.netology.moneytransferservice.service.MoneyTransferService;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Service
-@Slf4j
 public class MoneyTransferServiceImpl implements MoneyTransferService {
     private MoneyTransferRepository moneyTransferRepository;
+
+    public Map<String, DataOperation> operationsStorage = new ConcurrentHashMap<>();
+    private final AtomicInteger idNumber = new AtomicInteger(1);
+    public Map<String, String> confirmStorage = new ConcurrentHashMap<>();
+
     public MoneyTransferServiceImpl(MoneyTransferRepository moneyTransferRepository) {
         this.moneyTransferRepository = moneyTransferRepository;
     }
 
-    public String transfer(TransferDto transferDTO) {
-        log.info("Выполняется перевод суммы {} с карты {} на карту {}", transferDTO.getAmount(), transferDTO.getCardFromNumber(), transferDTO.getCardToNumber());
+    public String transfer(TransferDto transferData) {
+        String operationId;
+        String code = generateCode();
+        String logData = "Ошибка ввода данных карты";
+        String logTime = "Срок действия вашей карты истёк";
 
-        // из дто получить карту откуда - вытащить ее из репы, если ее нет, то бросить исключение
-        Card cardFrom = moneyTransferRepository.findCardByNumber(transferDTO.getCardFromNumber());
+        String cardValidTill = transferData.getCardFromValidTill();
 
-        if (cardFrom == null) {
-            throw new ErrorTransfer("[transfer]: Карты с таким номером нет");
+        if (validateCardDate(cardValidTill)) {
+            DataOperation dataNewOperation = moneyTransferRepository.transfer(transferData);
+
+            if (dataNewOperation != null) {
+                operationId = "Bn@Operation#000" + idNumber.getAndIncrement();
+                operationsStorage.put(operationId, dataNewOperation);
+                confirmStorage.put(operationId, code);
+
+                sendCodeToPhone(code);
+            } else {
+                throw new ErrorInputData(logData);
+            }
+        } else {
+            throw new ErrorInputData(logTime);
         }
 
-        // из дто получить карту куда - вытащить ее из репы, если ее нет, то бросить исключение
-        Card cardTo = moneyTransferRepository.findCardByNumber(transferDTO.getCardToNumber());
-
-        if (cardTo == null) {
-            throw new ErrorTransfer("[transfer]: Карты с таким номером нет");
-        }
-
-        // из дто получить сумму - проверить, что она не 0 и что она есть на карте откуда,  то бросить исключение
-        AmountDto amount = transferDTO.getAmount();
-        if (amount == null || amount.getValue() <= 0) {
-            throw new ErrorTransfer("[transfer]: Некорректное значение суммы! ");
-        }
-
-        // Проверяем, есть ли на карте указанная сумма
-        int allSum = cardFrom.getAmount() - amount.getValue();
-
-        if (allSum < 0) {
-            throw new ErrorTransfer("[transfer]: На карте указанной суммы нет!");
-        }
-
-        // отдать operationId
-        return moneyTransferRepository.transfer(transferDTO);
+        return operationId;
     }
 
-    public String confirmOperation(ConfirmDto confirmDTO) {
-        log.info("Выполняется подтверждение операции с id {} ", confirmDTO.getOperationId());
+    public String confirmOperation(ConfirmDto confirmDto) {
+        String operationId = confirmDto.getOperationId();
+        String logCode = "Неверный код подтверждения";
+        String logId = "Транзакция отклонена!";
 
+        if (confirmStorage.containsKey(operationId) && operationId != null) {
+            String code = confirmStorage.get(operationId);
 
-//        cardFrom.setAmount(allSum);
-//        cardTo.setAmount(amount.getValue());
-
-        return moneyTransferRepository.confirmOperation(confirmDTO);
+            if (code != null && isCodeCorrect(code)) {
+                DataOperation currentDataOperation = operationsStorage.get(operationId);
+                if (moneyTransferRepository.confirmOperation(operationId, currentDataOperation)) {
+                    System.out.println("Транзакция подтверждена!");
+                } else {
+                    System.out.println(logId);
+                    throw new ErrorConfirmation(logId);
+                }
+            } else {
+                System.out.println(logCode);
+                throw new ErrorConfirmation(logCode);
+            }
+        } else {
+            System.out.println(logId);
+            throw new ErrorConfirmation(logId);
+        }
+        return operationId;
     }
+
+    public static String generateCode() {
+        Random random = new Random();
+        int codeInt = random.nextInt(8999) + 1000;
+        return String.valueOf(codeInt);
+    }
+
+    public static String sendCodeToPhone(String code) {
+        String msg = "Клиенту на телефон отправлен код подтвержения транзакции: " + code;
+        System.out.println(msg);
+        return msg;
+    }
+
+    // Эмуляция верификации:
+    // если случайный код
+    // меньше или равен 5000,
+    // мы считаем, что клиент
+    // ввёл неверный пин-код.
+    public static boolean isCodeCorrect(String code) {
+        return (Integer.parseInt(code) > 5000);
+    }
+
+    public static boolean validateCardDate(String cardValdTill) {
+        Date cardDate = null;
+        SimpleDateFormat format = new SimpleDateFormat();
+        format.applyPattern("MM/yy");
+        try {
+            cardDate = format.parse(cardValdTill);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Date todaysDate = new Date();
+        if (cardDate != null) {
+            long diffDate = cardDate.getTime() - todaysDate.getTime();
+            int month = Integer.parseInt(cardValdTill.substring(0, 2));
+
+            return ((diffDate >= 0) && (month > 0) && (month < 13));
+        }
+        return false;
+    }
+
 }

@@ -12,5 +12,5 @@ public class Card {
     private String validTill;
     private String cvv;
 
-    private int amount;
+    private Account account;
 }

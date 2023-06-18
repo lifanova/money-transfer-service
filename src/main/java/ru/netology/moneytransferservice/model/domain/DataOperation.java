@@ -9,7 +9,11 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Operation {
-    private UUID operationId;
-    private String code;
+public class DataOperation {
+    private Card card;
+    private String cardToNumber;
+    private int transferValue;
+    private double value;
+    private double fee;
+
 }
