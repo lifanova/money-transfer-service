@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class MoneyTransferServiceImpl implements MoneyTransferService {
+
     private MoneyTransferRepository moneyTransferRepository;
 
     public Map<String, DataOperation> operationsStorage = new ConcurrentHashMap<>();
@@ -31,54 +32,50 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
     public String transfer(TransferDto transferData) {
         String operationId;
         String code = generateCode();
-        String logData = "Ошибка ввода данных карты";
-        String logTime = "Срок действия вашей карты истёк";
-
         String cardValidTill = transferData.getCardFromValidTill();
 
-        if (validateCardDate(cardValidTill)) {
-            DataOperation dataNewOperation = moneyTransferRepository.transfer(transferData);
-
-            if (dataNewOperation != null) {
-                operationId = "Bn@Operation#000" + idNumber.getAndIncrement();
-                operationsStorage.put(operationId, dataNewOperation);
-                confirmStorage.put(operationId, code);
-
-                sendCodeToPhone(code);
-            } else {
-                throw new ErrorInputData(logData);
-            }
-        } else {
-            throw new ErrorInputData(logTime);
+        if (!validateCardDate(cardValidTill)) {
+            throw new ErrorInputData("Срок действия вашей карты истёк");
         }
+
+        DataOperation dataNewOperation = moneyTransferRepository.transfer(transferData);
+
+        if (dataNewOperation == null) {
+            throw new ErrorInputData("Ошибка ввода данных карты");
+        }
+
+        operationId = "Bn@Operation#000" + idNumber.getAndIncrement();
+        operationsStorage.put(operationId, dataNewOperation);
+        confirmStorage.put(operationId, code);
+
+        sendCodeToPhone(code);
 
         return operationId;
     }
 
     public String confirmOperation(ConfirmDto confirmDto) {
         String operationId = confirmDto.getOperationId();
-        String logCode = "Неверный код подтверждения";
-        String logId = "Транзакция отклонена!";
 
-        if (confirmStorage.containsKey(operationId) && operationId != null) {
-            String code = confirmStorage.get(operationId);
-
-            if (code != null && isCodeCorrect(code)) {
-                DataOperation currentDataOperation = operationsStorage.get(operationId);
-                if (moneyTransferRepository.confirmOperation(operationId, currentDataOperation)) {
-                    System.out.println("Транзакция подтверждена!");
-                } else {
-                    System.out.println(logId);
-                    throw new ErrorConfirmation(logId);
-                }
-            } else {
-                System.out.println(logCode);
-                throw new ErrorConfirmation(logCode);
-            }
-        } else {
-            System.out.println(logId);
-            throw new ErrorConfirmation(logId);
+        if (operationId == null || !confirmStorage.containsKey(operationId)) {
+            System.out.println("Транзакция отклонена!");
+            throw new ErrorConfirmation("Транзакция отклонена!");
         }
+
+        String code = confirmStorage.get(operationId);
+
+        if (code == null || !isCodeCorrect(code)) {
+            System.out.println("Неверный код подтверждения");
+            throw new ErrorConfirmation("Неверный код подтверждения");
+        }
+
+        DataOperation currentDataOperation = operationsStorage.get(operationId);
+        if (moneyTransferRepository.confirmOperation(operationId, currentDataOperation)) {
+            System.out.println("Транзакция подтверждена!");
+        } else {
+            System.out.println("Транзакция отклонена!");
+            throw new ErrorConfirmation("Транзакция отклонена!");
+        }
+
         return operationId;
     }
 
